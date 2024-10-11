@@ -64,40 +64,42 @@ public class PulseSenderAppl {
 
     private static int getRandomPulseValue(long patientId) {
     	
-    	int returnValue = -1;
-    	
+    	int newValue = -1;
     	int prev = pulseStorage.getOrDefault(patientId, -1);
-
-        if (prev == -1) {
-            int firstValue = random.nextInt(MIN_PULSE_VALUE, MAX_PULSE_VALUE + 1);
-            pulseStorage.put(patientId, firstValue);
-            returnValue = firstValue;
+    	if (prev == -1) {
+           newValue = ifNoPrevValue(patientId);
         } else {
-           
-            boolean isJump = random.nextInt(100) < JUMP_PROBABILITY;
-            if (!isJump) {
-                returnValue = prev;
-            }
-
-           
-            boolean isPositiveJump = random.nextInt(100) < JUMP_POSITIVE_PROBABILITY;
-            int jumpPercent = random.nextInt(MIN_JUMP_PERCENT, MAX_JUMP_PERCENT + 1);
-
-          
-            int newValue = prev + (isPositiveJump ? 1 : -1) * (prev * jumpPercent / 100);
-
-          
-            if (newValue > MAX_PULSE_VALUE) {
-                newValue = MAX_PULSE_VALUE;
-            } else if (newValue < MIN_PULSE_VALUE) {
-                newValue = MIN_PULSE_VALUE;
-            }
-
-           
-            pulseStorage.put(patientId, newValue);
-            returnValue = newValue;
+           newValue = ifPrevValueExists(patientId, prev);
         }
-        return returnValue;
+        
+    	return newValue;
     }
+
+    private static int ifPrevValueExists(long patientId, int prev) {
+        int newValue = -1;
+        
+        boolean isJump = random.nextInt(100) < JUMP_PROBABILITY;
+        if (!isJump) {newValue = prev;}
+
+        boolean isPositiveJump = random.nextInt(100) < JUMP_POSITIVE_PROBABILITY;
+        int jumpPercent = random.nextInt(MIN_JUMP_PERCENT, MAX_JUMP_PERCENT + 1);
+        newValue = prev + (isPositiveJump ? 1 : -1) * (prev * jumpPercent / 100);
+        
+        if (newValue > MAX_PULSE_VALUE) {
+            newValue = MAX_PULSE_VALUE;
+        } else if (newValue < MIN_PULSE_VALUE) {
+            newValue = MIN_PULSE_VALUE;
+        }
+
+        pulseStorage.put(patientId, newValue); 
+        return newValue;
+    }
+
+	private static int ifNoPrevValue(long patientId) {
+		 int firstValue = random.nextInt(MIN_PULSE_VALUE, MAX_PULSE_VALUE + 1);
+         pulseStorage.put(patientId, firstValue);
+         return firstValue;
+		
+	}
 }
 
