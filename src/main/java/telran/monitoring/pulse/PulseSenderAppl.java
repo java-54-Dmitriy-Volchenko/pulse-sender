@@ -63,17 +63,20 @@ public class PulseSenderAppl {
     }
 
     private static int getRandomPulseValue(long patientId) {
-        int prev = pulseStorage.getOrDefault(patientId, -1);
+    	
+    	int returnValue = -1;
+    	
+    	int prev = pulseStorage.getOrDefault(patientId, -1);
 
         if (prev == -1) {
             int firstValue = random.nextInt(MIN_PULSE_VALUE, MAX_PULSE_VALUE + 1);
             pulseStorage.put(patientId, firstValue);
-            return firstValue;
+            returnValue = firstValue;
         } else {
            
             boolean isJump = random.nextInt(100) < JUMP_PROBABILITY;
             if (!isJump) {
-                return prev;
+                returnValue = prev;
             }
 
            
@@ -92,8 +95,9 @@ public class PulseSenderAppl {
 
            
             pulseStorage.put(patientId, newValue);
-            return newValue;
+            returnValue = newValue;
         }
+        return returnValue;
     }
 }
 
