@@ -76,24 +76,25 @@ public class PulseSenderAppl {
     }
 
     private static int ifPrevValueExists(long patientId, int prev) {
-        int newValue = -1;
+        int newValue = prev; 
         
         boolean isJump = random.nextInt(100) < JUMP_PROBABILITY;
-        if (!isJump) {newValue = prev;}
-
-        boolean isPositiveJump = random.nextInt(100) < JUMP_POSITIVE_PROBABILITY;
-        int jumpPercent = random.nextInt(MIN_JUMP_PERCENT, MAX_JUMP_PERCENT + 1);
-        newValue = prev + (isPositiveJump ? 1 : -1) * (prev * jumpPercent / 100);
-        
-        if (newValue > MAX_PULSE_VALUE) {
-            newValue = MAX_PULSE_VALUE;
-        } else if (newValue < MIN_PULSE_VALUE) {
-            newValue = MIN_PULSE_VALUE;
+        if (isJump) {
+            boolean isPositiveJump = random.nextInt(100) < JUMP_POSITIVE_PROBABILITY;
+            int jumpPercent = random.nextInt(MIN_JUMP_PERCENT, MAX_JUMP_PERCENT + 1);
+            newValue = prev + (isPositiveJump ? 1 : -1) * (prev * jumpPercent / 100);
+           
+            if (newValue > MAX_PULSE_VALUE) {
+                newValue = MAX_PULSE_VALUE;
+            } else if (newValue < MIN_PULSE_VALUE) {
+                newValue = MIN_PULSE_VALUE;
+            }
         }
 
         pulseStorage.put(patientId, newValue); 
         return newValue;
     }
+
 
 	private static int ifNoPrevValue(long patientId) {
 		 int firstValue = random.nextInt(MIN_PULSE_VALUE, MAX_PULSE_VALUE + 1);
